@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "fDoOrXMMhRE=",
+  "success": true,
+  "projectFilePath": "/workspaces/CS690-FinalProject/PetCareManagementSystem/PetCareManagement/PetCareManagement.csproj",
+  "expectedPackageFiles": [
+    "/home/codespace/.nuget/packages/spectre.console/0.54.0/spectre.console.0.54.0.nupkg.sha512",
+    "/home/codespace/.nuget/packages/spectre.console.cli/0.53.1/spectre.console.cli.0.53.1.nupkg.sha512"
+  ],
+  "logs": []
+}
