@@ -3,10 +3,16 @@ using PetCareManagementSystem.Data;
 
 namespace PetCareManagementSystem.Services
 {
+    /// <summary>
+    /// Handles saving and retrieving appointment records from persistent file storage.
+    /// </summary>
     public class AppointmentService
     {
         private FileStorageService storage = new FileStorageService();
 
+        /// <summary>
+        /// Saves a new appointment to the appointments file.
+        /// </summary>
         public void AddAppointment(Appointment appointment)
         {
             storage.Save(
@@ -15,6 +21,9 @@ namespace PetCareManagementSystem.Services
             );
         }
 
+        /// <summary>
+        /// Retrieves all appointments for a specific pet.
+        /// </summary>
         public List<Appointment> GetAppointments(string petId)
         {
             var lines = storage.Load(FilePaths.AppointmentsFile);
@@ -28,10 +37,10 @@ namespace PetCareManagementSystem.Services
                 {
                     appointments.Add(new Appointment
                     {
-                        PetId = parts[0],
+                        PetId           = parts[0],
                         AppointmentType = parts[1],
-                        Date = DateTime.Parse(parts[2]),
-                        Location = parts[3]
+                        Date            = DateTime.Parse(parts[2]),
+                        Location        = parts[3]
                     });
                 }
             }

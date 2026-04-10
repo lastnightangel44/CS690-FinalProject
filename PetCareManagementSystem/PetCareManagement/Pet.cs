@@ -1,5 +1,8 @@
 namespace PetCareManagementSystem.Models
 {
+    /// <summary>
+    /// Represents a pet registered in the system, associated with a specific user.
+    /// </summary>
     public class Pet
     {
         public string Id { get; set; }

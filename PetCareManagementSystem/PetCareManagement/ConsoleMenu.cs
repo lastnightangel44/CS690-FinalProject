@@ -3,6 +3,9 @@ using PetCareManagementSystem.Services;
 
 namespace PetCareManagementSystem.UI
 {
+    /// <summary>
+    /// Console-based user interface for the Pet Care Management System.
+    /// </summary>
     public class ConsoleMenu
     {
         private UserService userService = new UserService();
@@ -13,6 +16,9 @@ namespace PetCareManagementSystem.UI
 
         private User currentUser;
 
+        /// <summary>
+        /// Starts the UI. Handles user selection, then loops through the main menu.
+        /// </summary>
         public void Run()
         {
             currentUser = Start();
@@ -34,28 +40,19 @@ namespace PetCareManagementSystem.UI
 
                 switch (choice)
                 {
-                    case "1":
-                        ManagePets();
-                        break;
-
-                    case "2":
-                        ScheduleAppointment();
-                        break;
-
-                    case "3":
-                        ManageSupplies();
-                        break;
-
-                    case "4":
-                        ManageVaccinations();
-                        break;
-
-                    case "0":
-                        return;
+                    case "1":ManagePets();break;
+                    case "2":ScheduleAppointment();break;
+                    case "3":ManageSupplies();break;
+                    case "4":ManageVaccinations();break;
+                    case "0":return;
                 }
             }
         }
 
+        /// <summary>
+        /// Shows the startup screen and prompts the user to select or create a profile.
+        /// Loops until a valid user is returned.
+        /// </summary>
         public User Start()
         {
             while (true)
@@ -67,17 +64,16 @@ namespace PetCareManagementSystem.UI
 
                 var choice = Console.ReadLine();
 
-                if (choice == "1")
-                    return SelectUser();
-
-                if (choice == "2")
-                    CreateUser();
-
-                if (choice == "0")
-                    Environment.Exit(0);
+                if (choice == "1") return SelectUser();
+                if (choice == "2") CreateUser();
+                if (choice == "0") Environment.Exit(0);
             }
         }
 
+        /// <summary>
+        /// Displays existing users and returns the one selected.
+        /// If no users exist, prompts to create one first.
+        /// </summary>        
         private User SelectUser()
         {
             var users = userService.GetUsers();
@@ -95,10 +91,12 @@ namespace PetCareManagementSystem.UI
                 Console.WriteLine($"{i + 1}. {users[i].Name}");
 
             int choice = int.Parse(Console.ReadLine());
-
             return users[choice - 1];
         }
 
+        /// <summary>
+        /// Prompts for a name and creates a new user profile.
+        /// </summary>
         private void CreateUser()
         {
             Console.Write("Enter name: ");
@@ -109,6 +107,10 @@ namespace PetCareManagementSystem.UI
             Console.WriteLine("User created.\n");
         }
 
+        /// <summary>
+        /// Shows an overview of the user's pets, upcoming appointments,
+        /// low supplies, and vaccinations that are due.
+        /// </summary>
         private void ShowDashboard()
         {
             Console.WriteLine("===== PET CARE DASHBOARD =====");
@@ -122,8 +124,8 @@ namespace PetCareManagementSystem.UI
                 foreach (var pet in pets)
                     Console.WriteLine($"{pet.Name} ({pet.Species}) Age {pet.Age}");
 
+            // --- Upcoming Appointments --- 
             Console.WriteLine("\nUpcoming Appointments:");
-
             bool found = false;
 
             foreach (var pet in pets)
@@ -143,8 +145,8 @@ namespace PetCareManagementSystem.UI
             if (!found)
                 Console.WriteLine("No upcoming appointments.");
 
+            // --- Low Supplies --- 
             Console.WriteLine("\nLow Supplies:");
-
             var lowSupplies = supplyService.GetLowSupplies();
 
             if (lowSupplies.Count == 0)
@@ -153,8 +155,8 @@ namespace PetCareManagementSystem.UI
                 foreach (var s in lowSupplies)
                     Console.WriteLine($"{s.Name} - {supplyService.GetDaysRemaining(s)} days remaining");
 
+            // --- Vaccinations Due ---
             Console.WriteLine("\nVaccinations Due:");
-
             var due = vaccinationService.GetDueVaccinations();
 
             if (due.Count == 0)
@@ -164,6 +166,9 @@ namespace PetCareManagementSystem.UI
                     Console.WriteLine($"{v.VaccineName} for Pet {v.PetName} due {v.NextDueDate.ToShortDateString()}");
         }
 
+        /// <summary>
+        /// Menu for adding a new pet or listing existing pets for the current user.
+        /// </summary>
         private void ManagePets()
         {
             Console.WriteLine("\n1 Add Pet");
@@ -207,12 +212,13 @@ namespace PetCareManagementSystem.UI
             }
         }
 
+        /// <summary>
+        /// Prompts the user to select a pet and schedule an appointment for it.
+        /// </summary>
         private void ScheduleAppointment()
         {
             Pet pet = SelectPet();
-
-            if (pet == null)
-                    return;
+            if (pet == null) return;
 
             Appointment appointment = new Appointment();
 
@@ -230,6 +236,9 @@ namespace PetCareManagementSystem.UI
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Menu for adding a new supply item or viewing items that are running low.
+        /// </summary>
         private void ManageSupplies()
         {
             Console.WriteLine("\n1 Add Supply");
@@ -266,6 +275,11 @@ namespace PetCareManagementSystem.UI
             }
         }
 
+        /// <summary>
+        /// Menu for recording a new vaccination or viewing vaccinations that are currently due.
+        /// </summary>
+        /// 
+        /// 
         private void ManageVaccinations()
         {
             Console.WriteLine("\n1 Add Vaccination");
@@ -309,6 +323,10 @@ namespace PetCareManagementSystem.UI
             }
         }
 
+        /// <summary>
+        /// Displays a numbered list of the current user's pets and returns the selected one.
+        /// Returns null if the user has no pets registered.
+        /// </summary>        
         private Pet SelectPet()
         {
             var pets = petService.GetPetsByUser(currentUser.Id);

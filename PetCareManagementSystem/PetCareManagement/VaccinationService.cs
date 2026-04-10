@@ -3,10 +3,17 @@ using PetCareManagementSystem.Data;
 
 namespace PetCareManagementSystem.Services
 {
+    /// <summary>
+    /// Handles saving, retrieving, and evaluating vaccination records.
+    /// Vaccinations are stored as pipe-delimited lines: PetId|VaccineName|DateGiven|NextDueDate
+    /// </summary>
     public class VaccinationService
     {
         private FileStorageService storage = new FileStorageService();
 
+        /// <summary>
+        /// Saves a new vaccination record to the vaccinations file.
+        /// </summary>
         public void AddVaccination(Vaccination vaccination)
         {
             storage.Save(
@@ -15,6 +22,10 @@ namespace PetCareManagementSystem.Services
             );
         }
 
+
+        /// <summary>
+        /// Retrieves all vaccination records for a specific pet.
+        /// </summary>
         public List<Vaccination> GetVaccinations(string petId)
         {
             var lines = storage.Load(FilePaths.VaccinationsFile);
@@ -28,9 +39,9 @@ namespace PetCareManagementSystem.Services
                 {
                     vaccinations.Add(new Vaccination
                     {
-                        PetId = parts[0],
+                        PetId       = parts[0],
                         VaccineName = parts[1],
-                        DateGiven = DateTime.Parse(parts[2]),
+                        DateGiven   = DateTime.Parse(parts[2]),
                         NextDueDate = DateTime.Parse(parts[3])
                     });
                 }
@@ -39,6 +50,9 @@ namespace PetCareManagementSystem.Services
             return vaccinations;
         }
 
+        /// <summary>
+        /// Returns all vaccinations whose next due date is today or in the past.
+        /// </summary>
         public List<Vaccination> GetDueVaccinations()
         {
             var lines = storage.Load(FilePaths.VaccinationsFile);
@@ -54,9 +68,9 @@ namespace PetCareManagementSystem.Services
                 {
                     due.Add(new Vaccination
                     {
-                        PetId = parts[0],
+                        PetId       = parts[0],
                         VaccineName = parts[1],
-                        DateGiven = DateTime.Parse(parts[2]),
+                        DateGiven   = DateTime.Parse(parts[2]),
                         NextDueDate = nextDate
                     });
                 }

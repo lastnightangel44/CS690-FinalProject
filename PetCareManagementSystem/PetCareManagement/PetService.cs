@@ -3,10 +3,17 @@ using PetCareManagementSystem.Data;
 
 namespace PetCareManagementSystem.Services
 {
+    /// <summary>
+    /// Handles persistence and retrieval of pet records.
+    /// Pets are stored as pipe-delimited lines: Id|UserId|Name|Species|Breed|Age
+    /// </summary>
     public class PetService
     {
         private FileStorageService storage = new FileStorageService();
 
+        /// <summary>
+        /// Saves a new pet record to the pets file.
+        /// </summary>
         public void AddPet(Pet pet)
         {
             storage.Save(
@@ -15,6 +22,9 @@ namespace PetCareManagementSystem.Services
             );
         }
 
+        /// <summary>
+        /// Retrieves all pets belonging to a specific user.
+        /// </summary>
         public List<Pet> GetPetsByUser(string userId)
         {
             var lines = storage.Load(FilePaths.PetsFile);
@@ -28,19 +38,22 @@ namespace PetCareManagementSystem.Services
                 {
                     pets.Add(new Pet
                     {
-                        Id = parts[0],
-                        UserId = parts[1],
-                        Name = parts[2],
+                        Id      = parts[0],
+                        UserId  = parts[1],
+                        Name    = parts[2],
                         Species = parts[3],
-                        Breed = parts[4],
-                        Age = int.Parse(parts[5]),
+                        Breed   = parts[4],
+                        Age     = int.Parse(parts[5]),
                     });
                 }
             }
 
             return pets;
         }
-
+        
+        /// <summary>
+        /// Removes a pet record from the file by its unique ID.
+        /// </summary>
         public void DeletePet(string petId)
         {
             storage.DeleteLine(FilePaths.PetsFile, line => line.StartsWith(petId + "|"));

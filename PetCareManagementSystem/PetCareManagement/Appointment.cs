@@ -1,6 +1,8 @@
 namespace PetCareManagementSystem.Models
-
 {
+    /// <summary>
+    /// Represents a scheduled appointment for a pet, such as a vet visit or grooming session.
+    /// </summary>
     public class Appointment
     {
         public string PetId { get; set; }

@@ -1,5 +1,8 @@
 namespace PetCareManagementSystem.Data
 {
+    /// <summary>
+    /// Centralizes all file paths used for persistent storage
+    /// </summary>
     public static class FilePaths
     {
         public static string UsersFile = "users.txt";

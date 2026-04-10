@@ -3,16 +3,26 @@ using PetCareManagementSystem.Models;
 
 namespace PetCareManagementSystem.Services
 {
+    /// <summary>
+    /// Manages user account creation and retrieval.
+    /// Users are stored as pipe-delimited lines: Id|Name
+    /// </summary>
     public class UserService
     {
         private FileStorageService storage = new FileStorageService();
 
+        /// <summary>
+        /// Creates a new user with a generated unique ID and saves them to the users file.
+        /// </summary>
         public void CreateUser(string name)
         {
             string id = Guid.NewGuid().ToString();
             storage.Save(FilePaths.UsersFile, $"{id}|{name}");
         }
 
+        /// <summary>
+        /// Loads and returns all registered users.
+        /// </summary>
         public List<User> GetUsers()
         {
             var lines = storage.Load(FilePaths.UsersFile);
@@ -24,8 +34,8 @@ namespace PetCareManagementSystem.Services
 
                 users.Add(new User
                 {
-                    Id = parts[0],
-                    Name = parts[1]
+                    Id      = parts[0],
+                    Name    = parts[1]
                 });
             }
 
