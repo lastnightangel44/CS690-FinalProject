@@ -161,7 +161,7 @@ namespace PetCareManagementSystem.UI
                 Console.WriteLine("No vaccinations due.");
             else
                 foreach (var v in due)
-                    Console.WriteLine($"{v.VaccineName} for Pet {v.PetId} due {v.NextDueDate.ToShortDateString()}");
+                    Console.WriteLine($"{v.VaccineName} for Pet {v.PetName} due {v.NextDueDate.ToShortDateString()}");
         }
 
         private void ManagePets()
@@ -211,7 +211,12 @@ namespace PetCareManagementSystem.UI
         {
             Pet pet = SelectPet();
 
-            appointment.PetId = selectedPet.Id;
+            if (pet == null)
+                    return;
+
+            Appointment appointment = new Appointment();
+
+            appointment.PetId = pet.Id;
 
             Console.Write("Appointment Type (Vet/Grooming): ");
             appointment.AppointmentType = Console.ReadLine();
@@ -221,7 +226,7 @@ namespace PetCareManagementSystem.UI
 
             appointmentService.AddAppointment(appointment);
 
-            Console.WriteLine($"Appointment scheduled for {selectedPet.Name}! Select any key to continue.");
+            Console.WriteLine($"Appointment scheduled for {pet.Name}! Select any key to continue: ");
             Console.ReadKey();
         }
 
@@ -246,7 +251,7 @@ namespace PetCareManagementSystem.UI
 
                 supplyService.AddSupply(supply);
 
-                Console.WriteLine("Supply added.");
+                Console.WriteLine("Supply has been added! Select any key to continue: ");
                 Console.ReadKey();
             }
 
@@ -289,7 +294,7 @@ namespace PetCareManagementSystem.UI
 
                 vaccinationService.AddVaccination(vaccination);
 
-                Console.WriteLine($"Vaccination recorded for {pet.Name}.");
+                Console.WriteLine($"Vaccination recorded for {pet.Name}! Select any key to continue: ");
                 Console.ReadKey();
             }
 

@@ -28,7 +28,7 @@ namespace PetCareManagementSystem.Services
                 {
                     vaccinations.Add(new Vaccination
                     {
-                        PetName = parts[0],
+                        PetId = parts[0],
                         VaccineName = parts[1],
                         DateGiven = DateTime.Parse(parts[2]),
                         NextDueDate = DateTime.Parse(parts[3])

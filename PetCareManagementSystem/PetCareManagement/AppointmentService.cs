@@ -11,7 +11,7 @@ namespace PetCareManagementSystem.Services
         {
             storage.Save(
                 FilePaths.AppointmentsFile,
-                $"{appointment.PetName}|{appointment.AppointmentName}|{appointment.AppointmentType}|{appointment.Date}|{appointment.Location}"
+                $"{appointment.PetId}|{appointment.AppointmentType}|{appointment.Date}|{appointment.Location}"
             );
         }
 
@@ -28,11 +28,10 @@ namespace PetCareManagementSystem.Services
                 {
                     appointments.Add(new Appointment
                     {
-                        PetName = parts[0],
-                        AppointmentName = parts[1],
-                        AppointmentType = parts[2],
-                        Date = DateTime.Parse(parts[3]),
-                        Location = parts[4]
+                        PetId = parts[0],
+                        AppointmentType = parts[1],
+                        Date = DateTime.Parse(parts[2]),
+                        Location = parts[3]
                     });
                 }
             }

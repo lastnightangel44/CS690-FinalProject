@@ -11,7 +11,7 @@ namespace PetCareManagementSystem.Services
         {
             storage.Save(
                 FilePaths.PetsFile,
-                $"{pet.Id}|{pet.UserId}|{pet.Name}|{pet.Species}|{pet.Breed}|{pet.Age}|{pet.Weight}"
+                $"{pet.Id}|{pet.UserId}|{pet.Name}|{pet.Species}|{pet.Breed}|{pet.Age}"
             );
         }
 
@@ -34,7 +34,6 @@ namespace PetCareManagementSystem.Services
                         Species = parts[3],
                         Breed = parts[4],
                         Age = int.Parse(parts[5]),
-                        Weight = float.Parse(parts[6])
                     });
                 }
             }
