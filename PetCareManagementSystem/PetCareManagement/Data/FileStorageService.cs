@@ -17,13 +17,8 @@ namespace PetCareManagementSystem.Data
         /// </summary>        
         private void EnsureFileExists(string path)
         {
-            // Create the parent directory if it doesn't exist yet
-            string directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
             if (!File.Exists(path))
-                File.Create(path).Close();
+            File.Create(path).Close();
         }
 
         /// <summary>
