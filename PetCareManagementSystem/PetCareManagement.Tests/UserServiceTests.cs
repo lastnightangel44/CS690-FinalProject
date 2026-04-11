@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
     public class UserServiceTests
     {
         [Fact]
-        public void CreateUser_SavesTheUser()
+        public void Test_CreateUser()
         {
             TestHelper.ResetTestFiles();
             var service = new UserService();
@@ -21,7 +21,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void UpdateUser_ChangesTheName()
+        public void Test_UpdateUser()
         {
             TestHelper.ResetTestFiles();
             var service = new UserService();
@@ -36,7 +36,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeleteUser_RemovesTheUser()
+        public void Test_DeleteUser()
         {
             TestHelper.ResetTestFiles();
             var service = new UserService();

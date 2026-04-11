@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
     public class FileStorageServiceTests
     {
         [Fact]
-        public void Save_ThenLoad_ReturnsTheSameLine()
+        public void Test_Save_Load()
         {
             TestHelper.ResetTestFiles();
             var storage = new FileStorageService();
@@ -21,7 +21,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeleteLine_RemovesTheMatchingLine()
+        public void Test_DeleteLine()
         {
             TestHelper.ResetTestFiles();
             var storage = new FileStorageService();
@@ -38,7 +38,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void UpdateLine_ReplacesTheMatchingLine()
+        public void Test_UpdateLine()
         {
             TestHelper.ResetTestFiles();
             var storage = new FileStorageService();

@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
 {
     public class VaccinationServiceTests
     {
-        private Vaccination MakeVaccination()
+        private Vaccination Test_MakeVaccination()
         {
             return new Vaccination
             {
@@ -20,11 +20,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void AddVaccination_SavesTheVaccination()
+        public void Test_AddVaccination()
         {
             TestHelper.ResetTestFiles();
             var service = new VaccinationService();
-            Vaccination vax = MakeVaccination();
+            Vaccination vax = Test_MakeVaccination();
 
             service.AddVaccination(vax);
             List<Vaccination> results = service.GetVaccinations(vax.PetId);
@@ -34,7 +34,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void GetDueVaccinations_ReturnsOverdueVaccination()
+        public void Test_GetDueVaccinations()
         {
             TestHelper.ResetTestFiles();
             var service = new VaccinationService();
@@ -54,11 +54,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeleteVaccination_RemovesTheVaccination()
+        public void Test_DeleteVaccination()
         {
             TestHelper.ResetTestFiles();
             var service = new VaccinationService();
-            Vaccination vax = MakeVaccination();
+            Vaccination vax = Test_MakeVaccination();
 
             service.AddVaccination(vax);
             service.DeleteVaccination(vax);

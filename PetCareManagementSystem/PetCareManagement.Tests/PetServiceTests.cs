@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
 {
     public class PetServiceTests
     {
-        private Pet MakePet()
+        private Pet Test_MakePet()
         {
             return new Pet
             {
@@ -22,11 +22,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void AddPet_SavesThePet()
+        public void Test_AddPet()
         {
             TestHelper.ResetTestFiles();
             var service = new PetService();
-            Pet pet = MakePet();
+            Pet pet = Test_MakePet();
 
             service.AddPet(pet);
             List<Pet> pets = service.GetPetsByUser(pet.UserId);
@@ -36,11 +36,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void UpdatePet_ChangesTheName()
+        public void Test_UpdatePet()
         {
             TestHelper.ResetTestFiles();
             var service = new PetService();
-            Pet pet = MakePet();
+            Pet pet = Test_MakePet();
 
             service.AddPet(pet);
             pet.Name = "Bella Updated";
@@ -50,11 +50,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeletePet_RemovesThePet()
+        public void Test_DeletePet()
         {
             TestHelper.ResetTestFiles();
             var service = new PetService();
-            Pet pet = MakePet();
+            Pet pet = Test_MakePet();
 
             service.AddPet(pet);
             service.DeletePet(pet.Id);

@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
 {
     public class AppointmentServiceTests
     {
-        private Appointment MakeAppointment()
+        private Appointment Test_MakeAppointment()
         {
             return new Appointment
             {
@@ -20,11 +20,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void AddAppointment_SavesTheAppointment()
+        public void Test_AddAppointment()
         {
             TestHelper.ResetTestFiles();
             var service = new AppointmentService();
-            Appointment appt = MakeAppointment();
+            Appointment appt = Test_MakeAppointment();
 
             service.AddAppointment(appt);
             List<Appointment> results = service.GetAppointments(appt.PetId);
@@ -34,11 +34,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void UpdateAppointment_ChangesTheType()
+        public void Test_UpdateAppointment()
         {
             TestHelper.ResetTestFiles();
             var service = new AppointmentService();
-            Appointment original = MakeAppointment();
+            Appointment original = Test_MakeAppointment();
 
             service.AddAppointment(original);
 
@@ -56,11 +56,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeleteAppointment_RemovesTheAppointment()
+        public void Test_DeleteAppointment()
         {
             TestHelper.ResetTestFiles();
             var service = new AppointmentService();
-            Appointment appt = MakeAppointment();
+            Appointment appt = Test_MakeAppointment();
 
             service.AddAppointment(appt);
             service.DeleteAppointment(appt);

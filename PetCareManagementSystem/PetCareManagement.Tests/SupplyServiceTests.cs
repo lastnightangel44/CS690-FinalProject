@@ -9,7 +9,7 @@ namespace PetCareManagementSystem.Tests
     public class SupplyServiceTests
     {
         [Fact]
-        public void AddSupply_SavesTheSupply()
+        public void Test_AddSupply()
         {
             TestHelper.ResetTestFiles();
             var service = new SupplyService();
@@ -28,7 +28,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void GetLowSupplies_ReturnsSupplyWithOneDayLeft()
+        public void Test_GetLowSupplies()
         {
             TestHelper.ResetTestFiles();
             var service = new SupplyService();
@@ -48,7 +48,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void DeleteSupply_RemovesTheSupply()
+        public void Test_DeleteSupply()
         {
             TestHelper.ResetTestFiles();
             var service = new SupplyService();
