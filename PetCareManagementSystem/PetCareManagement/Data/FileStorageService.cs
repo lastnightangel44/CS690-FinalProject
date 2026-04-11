@@ -12,7 +12,6 @@ namespace PetCareManagementSystem.Data
     /// </summary>    
     public class FileStorageService
     {
-
         /// <summary>
         /// Creates the file at the given path if it does not already exist.
         /// </summary>        
@@ -40,7 +39,6 @@ namespace PetCareManagementSystem.Data
         /// Reads all lines from the specified file and returns them as a list.
         /// Returns an empty list if the file is empty.
         /// </summary>
-
         public List<string> Load(string path)
         {
             EnsureFileExists(path);

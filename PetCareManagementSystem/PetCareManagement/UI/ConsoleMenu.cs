@@ -136,7 +136,6 @@ namespace PetCareManagementSystem.UI
                     }
                 }
             }
-
             if (!found)
                 Console.WriteLine("  No upcoming appointments.");
 
@@ -160,7 +159,9 @@ namespace PetCareManagementSystem.UI
         }
 
         /// <summary>
-        /// Menu for adding a new pet or listing existing pets for the current user.
+        /// Displays the pet menu and handles all pet actions
+        /// including adding, viewing, editing, and deleting pets.
+        /// Delegates all data operations to PetService.
         /// </summary>
         private void ManagePets()
         {
@@ -175,6 +176,7 @@ namespace PetCareManagementSystem.UI
 
             if (choice == "1")
             {
+                // add pet
                 Pet pet = new Pet();
 
                 pet.Id = Guid.NewGuid().ToString();
@@ -193,22 +195,23 @@ namespace PetCareManagementSystem.UI
                 pet.Age = int.Parse(Console.ReadLine());
 
                 petService.AddPet(pet);
-                Console.WriteLine("Pet added! Hit any key to continue.");
+                Console.WriteLine("Pet added! Press any key to continue.");
                 Console.ReadKey();
             }
-
-            if (choice == "2")
+             else if (choice == "2")
             {
+                // list pet
                 var pets = petService.GetPetsByUser(currentUser.Id);
 
                 foreach (var pet in pets)
                     Console.WriteLine($"  {pet.Name} ({pet.Species}) Age {pet.Age}");
-
+                
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
             {
-                // Edit pet — let the user pick which field(s) to change
+                // Edit pet 
                 var pet = SelectPet();
                 if (pet == null) return;
 
@@ -231,11 +234,12 @@ namespace PetCareManagementSystem.UI
                 if (!string.IsNullOrWhiteSpace(input)) pet.Age = int.Parse(input);
 
                 petService.UpdatePet(pet);
-                Console.WriteLine("Pet updated!");
+                Console.WriteLine("Pet updated! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "4")
             {
+                // delete pet
                 var pet = SelectPet();
                 if (pet == null) return;
 
@@ -249,12 +253,15 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }
 
         /// <summary>
-        /// Manage Appointments
+        /// Displays the appointment menu and handles all appointment management actions
+        /// including adding, viewing, editing, and deleting appointments.
+        /// Delegates all data operations to AppointmentService.
         /// </summary>
         private void ManageAppointments()
         {
@@ -269,6 +276,7 @@ namespace PetCareManagementSystem.UI
 
             if (choice == "1")
             {
+                // Schedule appointment
                 var pet = SelectPet();
                 if (pet == null) return;
 
@@ -284,11 +292,12 @@ namespace PetCareManagementSystem.UI
                 appointment.Location = Console.ReadLine();
 
                 appointmentService.AddAppointment(appointment);
-                Console.WriteLine($"Appointment scheduled for {pet.Name}!");
+                Console.WriteLine($"Appointment scheduled for {pet.Name}! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "2")
             {
+                // view all appointments
                 var pets = petService.GetPetsByUser(currentUser.Id);
                 bool any = false;
 
@@ -303,16 +312,17 @@ namespace PetCareManagementSystem.UI
                 }
 
                 if (!any) Console.WriteLine("No appointments found.");
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
             {
-                // Build a flat numbered list of appointments across all the user's pets
+                // edit appointments
                 var appointments = GetCurrentUserAppointments(out var petLookup);
 
                 if (appointments.Count == 0)
                 {
-                    Console.WriteLine("No appointments to edit.");
+                    Console.WriteLine("No appointments to edit. Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -339,16 +349,17 @@ namespace PetCareManagementSystem.UI
                 if (!string.IsNullOrWhiteSpace(input)) updated.Location = input;
 
                 appointmentService.UpdateAppointment(original, updated);
-                Console.WriteLine("Appointment updated!");
+                Console.WriteLine("Appointment updated! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "4")
             {
+                // delete appointments
                 var appointments = GetCurrentUserAppointments(out var petLookup);
 
                 if (appointments.Count == 0)
                 {
-                    Console.WriteLine("No appointments to delete.");
+                    Console.WriteLine("No appointments to delete. Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -369,12 +380,15 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }
 
         /// <summary>
-        /// Menu for adding a new supply item or viewing items that are running low.
+        /// Displays the supplies menu and handles all supply management actions
+        /// including adding, viewing, editing, and deleting supplies.
+        /// Delegates all data operations to SupplyService.
         /// </summary>
         private void ManageSupplies()
         {
@@ -390,6 +404,7 @@ namespace PetCareManagementSystem.UI
 
             if (choice == "1")
             {
+                // add supply
                 var supply = new Supply { PurchaseDate = DateTime.Now };
 
                 Console.Write("Supply Name: ");
@@ -399,11 +414,12 @@ namespace PetCareManagementSystem.UI
                 supply.DurationDays = int.Parse(Console.ReadLine());
 
                 supplyService.AddSupply(supply);
-                Console.WriteLine("Supply added!");
+                Console.WriteLine("Supply added! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "2")
             {
+                // view all supplies
                 var supplies = supplyService.GetSupplies();
 
                 if (supplies.Count == 0)
@@ -412,10 +428,12 @@ namespace PetCareManagementSystem.UI
                     foreach (var s in supplies)
                         Console.WriteLine($"{s.Name} | Purchased {s.PurchaseDate.ToShortDateString()} | {supplyService.GetDaysRemaining(s)} days remaining");
 
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
             {
+                // view low supplies
                 var low = supplyService.GetLowSupplies();
 
                 if (low.Count == 0)
@@ -423,16 +441,17 @@ namespace PetCareManagementSystem.UI
                 else
                     foreach (var s in low)
                         Console.WriteLine($"{s.Name} - {supplyService.GetDaysRemaining(s)} days remaining");
-
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "4")
             {
+                // edit supplies
                 var supplies = supplyService.GetSupplies();
 
                 if (supplies.Count == 0)
                 {
-                    Console.WriteLine("No supplies to edit.");
+                    Console.WriteLine("No supplies to edit. Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -464,16 +483,17 @@ namespace PetCareManagementSystem.UI
                     updated.PurchaseDate = DateTime.Now;
 
                 supplyService.UpdateSupply(original, updated);
-                Console.WriteLine("Supply updated!");
+                Console.WriteLine("Supply updated! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "5")
             {
+                // delete supplies
                 var supplies = supplyService.GetSupplies();
 
                 if (supplies.Count == 0)
                 {
-                    Console.WriteLine("No supplies to delete.");
+                    Console.WriteLine("No supplies to delete. Press any key to continue. ");
                     Console.ReadKey();
                     return;
                 }
@@ -494,15 +514,16 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }
 
         /// <summary>
-        /// Menu for recording a new vaccination or viewing vaccinations that are currently due.
+        /// Displays the vaccinations menu and handles all vaccination management actions
+        /// including adding, viewing, editing, and deleting vaccination records.
+        /// Delegates all data operations to VaccinationService.
         /// </summary>
-        /// 
-        /// 
         private void ManageVaccinations()
         {
             Console.WriteLine("\n==== MANAGE VACCINATIONS ====");
@@ -517,6 +538,7 @@ namespace PetCareManagementSystem.UI
 
             if (choice == "1")
             {
+                // new vaccination
                 var pet = SelectPet();
                 if (pet == null) return;
 
@@ -533,11 +555,12 @@ namespace PetCareManagementSystem.UI
                 vaccination.NextDueDate = DateTime.Parse(Console.ReadLine());
 
                 vaccinationService.AddVaccination(vaccination);
-                Console.WriteLine($"Vaccination recorded for {pet.Name}!");
+                Console.WriteLine($"Vaccination recorded for {pet.Name}! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "2")
             {
+                // View all vaccinantions
                 var pets = petService.GetPetsByUser(currentUser.Id);
                 bool any = false;
 
@@ -551,11 +574,12 @@ namespace PetCareManagementSystem.UI
                     }
                 }
 
-                if (!any) Console.WriteLine("No vaccinations recorded.");
+                if (!any) Console.WriteLine("No vaccinations recorded. Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
             {
+                //view due or over due vaccinations
                 var due = vaccinationService.GetDueVaccinations();
 
                 if (due.Count == 0)
@@ -563,16 +587,17 @@ namespace PetCareManagementSystem.UI
                 else
                     foreach (var v in due)
                         Console.WriteLine($"{v.VaccineName} due {v.NextDueDate.ToShortDateString()}");
-
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "4")
             {
+                //edit vaccinations
                 var vaccinations = GetCurrentUserVaccinations(out var petLookup);
 
                 if (vaccinations.Count == 0)
                 {
-                    Console.WriteLine("No vaccinations to edit.");
+                    Console.WriteLine("No vaccinations to edit. Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -595,16 +620,17 @@ namespace PetCareManagementSystem.UI
                 if (!string.IsNullOrWhiteSpace(input)) updated.NextDueDate = DateTime.Parse(input);
 
                 vaccinationService.UpdateVaccination(original, updated);
-                Console.WriteLine("Vaccination updated!");
+                Console.WriteLine("Vaccination updated! Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "5")
             {
+                // delete vaccinations
                 var vaccinations = GetCurrentUserVaccinations(out var petLookup);
 
                 if (vaccinations.Count == 0)
                 {
-                    Console.WriteLine("No vaccinations to delete.");
+                    Console.WriteLine("No vaccinations to delete. Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -625,10 +651,16 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }
 
+        /// <summary>
+        /// Displays the user menu and handles all user actions
+        /// including viewing users, editing user name, and deleting users.
+        /// Delegates all data operations to UserService.
+        /// </summary>
         private void ManageUsers()
         {
             Console.WriteLine("\n==== MANAGE USERS ====");
@@ -641,13 +673,16 @@ namespace PetCareManagementSystem.UI
 
             if (choice == "1")
             {
+                // list users
                 var users = userService.GetUsers();
                 foreach (var u in users)
                     Console.WriteLine($"{u.Name} (id: {u.Id})");
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "2")
             {
+                // edit current user name
                 Console.Write($"New name for {currentUser.Name}: ");
                 var newName = Console.ReadLine();
 
@@ -661,10 +696,12 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Name cannot be blank. No changes made.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
             {
+                // delete users
                 var users = userService.GetUsers();
 
                 for (int i = 0; i < users.Count; i++)
@@ -678,6 +715,7 @@ namespace PetCareManagementSystem.UI
                 if (target.Id == currentUser.Id)
                 {
                     Console.WriteLine("You cannot delete the currently active user. Switch users first.");
+                    Console.WriteLine("Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -692,6 +730,7 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }
@@ -707,6 +746,7 @@ namespace PetCareManagementSystem.UI
             if (pets.Count == 0)
             {
                 Console.WriteLine("No pets found. Please add a pet first.");
+                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
                 return null;
             }
@@ -753,6 +793,9 @@ namespace PetCareManagementSystem.UI
             return all;
         }
 
+        /// <summary>
+        /// displays a numbered list of appointments to the console
+        /// </summary>
         private void PrintAppointmentList(List<Appointment> appointments, Dictionary<string, Pet> petLookup)
         {
             for (int i = 0; i < appointments.Count; i++)
@@ -763,12 +806,18 @@ namespace PetCareManagementSystem.UI
             }
         }
 
+        /// <summary>
+        /// displays a numbered list of supplies to the console
+        /// </summary>
         private void PrintSupplyList(List<Supply> supplies)
         {
             for (int i = 0; i < supplies.Count; i++)
                 Console.WriteLine($"{i + 1}. {supplies[i].Name} | {supplyService.GetDaysRemaining(supplies[i])} days remaining");
         }
 
+        /// <summary>
+        /// displays a numbered list of vaccinations to the console
+        /// </summary>
         private void PrintVaccinationList(List<Vaccination> vaccinations, Dictionary<string, Pet> petLookup)
         {
             for (int i = 0; i < vaccinations.Count; i++)
@@ -779,6 +828,9 @@ namespace PetCareManagementSystem.UI
             }
         }
 
+        /// <summary>
+        /// creates a copy of the original appointment that will be edited by the user
+        /// </summary>
         private static Appointment CopyAppointment(Appointment a)
         {
             return new Appointment
@@ -791,6 +843,9 @@ namespace PetCareManagementSystem.UI
             
         }
 
+        /// <summary>
+        /// creates a copy of the original vaccination that will be edited by the user
+        /// </summary>
         private static Vaccination CopyVaccination(Vaccination v)
         {
             return new Vaccination

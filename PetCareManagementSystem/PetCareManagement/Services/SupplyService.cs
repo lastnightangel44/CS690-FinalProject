@@ -11,7 +11,6 @@ namespace PetCareManagementSystem.Services
     {
         private FileStorageService storage = new FileStorageService();
 
-        // Supplies with this many days or fewer remaining are considered "low"
         private const int LowSupplyThresholdDays = 7;
 
         /// <summary>

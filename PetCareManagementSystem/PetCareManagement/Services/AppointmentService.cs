@@ -4,7 +4,8 @@ using PetCareManagementSystem.Data;
 namespace PetCareManagementSystem.Services
 {
     /// <summary>
-    /// Handles saving and retrieving appointment records from persistent file storage.
+    /// Appointment records
+    /// Appointments are stored as pipe-delimited lines: PetId|AppointmentType|Date|Location
     /// </summary>
     public class AppointmentService
     {
