@@ -150,12 +150,19 @@ namespace PetCareManagementSystem.UI
 
             // --- Vaccinations Due ---
             Console.WriteLine("\nVaccinations Due:");
-            var due = vaccinationService.GetDueVaccinations();
-            if (due.Count == 30)
-                Console.WriteLine("No vaccinations due.");
-            else
-                foreach (var v in due)
-                    Console.WriteLine($"  {v.VaccineName} for Pet {v.PetName} due {v.NextDueDate.ToShortDateString()}");
+            bool anyDue = false;
+            foreach (var pet in pets)
+            {
+                foreach (var v in vaccinationService.GetVaccinations(pet.Id))
+                {
+                    if (v.NextDueDate <= DateTime.Now)
+                    {
+                        Console.WriteLine($"  {v.VaccineName} for {pet.Name} due {v.NextDueDate.ToShortDateString()}");
+                        anyDue = true;
+                    }
+                }
+            }
+            if (!anyDue) Console.WriteLine("  No vaccinations due.");
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace PetCareManagementSystem.Tests
     public class FileStorageServiceTests
     {
         [Fact]
-        public void Test_Save_Load()
+        public void Test_Save()
         {
             TestHelper.ResetTestFiles();
             var storage = new FileStorageService();
