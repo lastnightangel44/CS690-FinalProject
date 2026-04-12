@@ -22,14 +22,7 @@ namespace PetCareManagementSystem.Services
             if (string.IsNullOrWhiteSpace(medication.Id))
                 medication.Id = Guid.NewGuid().ToString();
 
-            string endDate = medication.EndDate.HasValue
-                ? medication.EndDate.Value.ToString()
-                : string.Empty;
-
-            storage.Save(
-                FilePaths.MedicationsFile,
-                $"{medication.Id}|{medication.PetId}|{medication.Name}|{medication.Dosage}|{medication.Frequency}|{medication.StartDate}|{endDate}|{medication.Notes}"
-            );
+            storage.Save(FilePaths.MedicationsFile, Serialize(medication));
         }
 
         /// <summary>
@@ -97,18 +90,12 @@ namespace PetCareManagementSystem.Services
         /// </summary>
         public void UpdateMedication(Medication updated)
         {
-            string endDate = updated.EndDate.HasValue
-                ? updated.EndDate.Value.ToString()
-                : string.Empty;
-
-            string newLine = $"{updated.Id}|{updated.PetId}|{updated.Name}|{updated.Dosage}|{updated.Frequency}|{updated.StartDate}|{endDate}|{updated.Notes}";
-
             bool MatchesMedication(string line)
             {
                 return line.StartsWith(updated.Id + "|");
             }
 
-            storage.UpdateLine(FilePaths.MedicationsFile, MatchesMedication, newLine);
+            storage.UpdateLine(FilePaths.MedicationsFile, MatchesMedication, Serialize(updated));
         }
 
         /// <summary>
@@ -147,15 +134,15 @@ namespace PetCareManagementSystem.Services
         {
             return new Medication
             {
-                Id        = parts[0],
-                PetId     = parts[1],
-                Name      = parts[2],
-                Dosage    = parts[3],
-                Frequency = parts[4],
+                Id                 = parts[0],
+                PetId              = parts[1],
+                Name               = parts[2],
+                Dosage             = parts[3],
+                Frequency          = parts[4],
                 AdministrationTime = string.IsNullOrWhiteSpace(parts[5]) ? null : TimeSpan.Parse(parts[5]),
-                StartDate = DateTime.Parse(parts[6]),
-                EndDate   = string.IsNullOrWhiteSpace(parts[6]) ? null : DateTime.Parse(parts[7]),
-                Notes     = parts[8]
+                StartDate          = DateTime.Parse(parts[6]),
+                EndDate            = string.IsNullOrWhiteSpace(parts[7]) ? null : DateTime.Parse(parts[7]),
+                Notes              = parts[8]
             };
         }
     }

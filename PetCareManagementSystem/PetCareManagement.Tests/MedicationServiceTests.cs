@@ -8,27 +8,32 @@ namespace PetCareManagementSystem.Tests
 {
     public class MedicationServiceTests
     {
-        private Medication Test_MakeMedication()
+        /// <summary>
+        /// Creates a sample medication with all fields populated including
+        /// AdministrationTime to match the v4.0 storage format.
+        /// </summary>
+        private Medication MakeMedication()
         {
             return new Medication
             {
-                Id        = Guid.NewGuid().ToString(),
-                PetId     = Guid.NewGuid().ToString(),
-                Name      = "Antibiotics",
-                Dosage    = "5mg",
-                Frequency = "Once daily",
-                StartDate = DateTime.Today,
-                EndDate   = DateTime.Today.AddDays(10),
-                Notes     = "Give with food"
+                Id                 = Guid.NewGuid().ToString(),
+                PetId              = Guid.NewGuid().ToString(),
+                Name               = "Antibiotics",
+                Dosage             = "5mg",
+                Frequency          = "Once daily",
+                AdministrationTime = new TimeSpan(8, 0, 0),   // 08:00
+                StartDate          = DateTime.Today,
+                EndDate            = DateTime.Today.AddDays(10),
+                Notes              = "Give with food"
             };
         }
 
         [Fact]
-        public void Test_AddMedication()
+        public void AddMedication_SavesTheMedication()
         {
             TestHelper.ResetTestFiles();
             var service = new MedicationService();
-            Medication med = Test_MakeMedication();
+            Medication med = MakeMedication();
 
             service.AddMedication(med);
             List<Medication> results = service.GetMedications(med.PetId);
@@ -38,7 +43,7 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void Test_GetActiveMedications()
+        public void GetActiveMedications_ReturnsOnlyActiveMedications()
         {
             TestHelper.ResetTestFiles();
             var service = new MedicationService();
@@ -47,27 +52,29 @@ namespace PetCareManagementSystem.Tests
             // Active — end date in the future
             service.AddMedication(new Medication
             {
-                Id        = Guid.NewGuid().ToString(),
-                PetId     = petId,
-                Name      = "Antibiotics",
-                Dosage    = "5mg",
-                Frequency = "Once daily",
-                StartDate = DateTime.Today,
-                EndDate   = DateTime.Today.AddDays(10),
-                Notes     = ""
+                Id                 = Guid.NewGuid().ToString(),
+                PetId              = petId,
+                Name               = "Antibiotics",
+                Dosage             = "5mg",
+                Frequency          = "Once daily",
+                AdministrationTime = new TimeSpan(8, 0, 0),
+                StartDate          = DateTime.Today,
+                EndDate            = DateTime.Today.AddDays(10),
+                Notes              = ""
             });
 
             // Inactive — end date in the past
             service.AddMedication(new Medication
             {
-                Id        = Guid.NewGuid().ToString(),
-                PetId     = petId,
-                Name      = "Old Treatment",
-                Dosage    = "10mg",
-                Frequency = "Twice daily",
-                StartDate = DateTime.Today.AddDays(-30),
-                EndDate   = DateTime.Today.AddDays(-10),
-                Notes     = ""
+                Id                 = Guid.NewGuid().ToString(),
+                PetId              = petId,
+                Name               = "Old Treatment",
+                Dosage             = "10mg",
+                Frequency          = "Twice daily",
+                AdministrationTime = null,
+                StartDate          = DateTime.Today.AddDays(-30),
+                EndDate            = DateTime.Today.AddDays(-10),
+                Notes              = ""
             });
 
             List<Medication> active = service.GetActiveMedications(petId);
@@ -77,11 +84,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void Test_UpdateMedication()
+        public void UpdateMedication_ChangesTheDosage()
         {
             TestHelper.ResetTestFiles();
             var service = new MedicationService();
-            Medication med = Test_MakeMedication();
+            Medication med = MakeMedication();
 
             service.AddMedication(med);
             med.Dosage = "10mg";
@@ -92,11 +99,11 @@ namespace PetCareManagementSystem.Tests
         }
 
         [Fact]
-        public void Test_DeleteMedication()
+        public void DeleteMedication_RemovesTheMedication()
         {
             TestHelper.ResetTestFiles();
             var service = new MedicationService();
-            Medication med = Test_MakeMedication();
+            Medication med = MakeMedication();
 
             service.AddMedication(med);
             service.DeleteMedication(med.Id);
