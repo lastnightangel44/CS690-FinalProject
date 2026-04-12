@@ -481,3 +481,10 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 publish/
+users.txt
+pets.txt
+appointments.txt
+supplies.txt
+vaccinations.txt
+medications.txt
+*.txt
