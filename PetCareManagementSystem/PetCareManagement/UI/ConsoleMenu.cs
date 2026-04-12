@@ -8,11 +8,12 @@ namespace PetCareManagementSystem.UI
     /// </summary>
     public class ConsoleMenu
     {
-        private UserService userService = new UserService();
-        private PetService petService = new PetService();
-        private AppointmentService appointmentService = new AppointmentService();
-        private SupplyService supplyService = new SupplyService();
-        private VaccinationService vaccinationService = new VaccinationService();
+        private readonly UserService userService = new UserService();
+        private readonly PetService petService = new PetService();
+        private readonly AppointmentService appointmentService = new AppointmentService();
+        private readonly SupplyService supplyService = new SupplyService();
+        private readonly VaccinationService vaccinationService = new VaccinationService();
+        private readonly MedicationService medicationService   = new MedicationService();
 
         private User currentUser;
 
@@ -33,18 +34,20 @@ namespace PetCareManagementSystem.UI
                 Console.WriteLine("2 Manage Appointment");
                 Console.WriteLine("3 Manage Supplies");
                 Console.WriteLine("4 Manage Vaccinations");
-                Console.WriteLine("5 Manage Users");
+                Console.WriteLine("5 Manage Medications");
+                Console.WriteLine("6 Manage Users");
                 Console.WriteLine("0 Exit");
 
                 string choice = Console.ReadLine();
 
                 switch (choice)
                 {
-                    case "1": ManagePets();          break;
-                    case "2": ManageAppointments();  break;
-                    case "3": ManageSupplies();       break;
-                    case "4": ManageVaccinations();   break;
-                    case "5": ManageUsers();          break;
+                    case "1": ManagePets();             break;
+                    case "2": ManageAppointments();     break;
+                    case "3": ManageSupplies();         break;
+                    case "4": ManageVaccinations();     break;
+                    case "5": ManageMedications();      break;
+                    case "6": ManageUsers();            break;
                     case "0": return;
                 }
             }
@@ -163,6 +166,23 @@ namespace PetCareManagementSystem.UI
                 }
             }
             if (!anyDue) Console.WriteLine("  No vaccinations due.");
+
+            // --- Active Medications ---
+            Console.WriteLine("\nActive Medications:");
+            bool anyMeds = false;
+            foreach (var pet in pets)
+            {
+                var meds = medicationService.GetActiveMedications(pet.Id);
+                foreach (var m in meds)
+                {
+                    string endDisplay = m.EndDate.HasValue
+                        ? $"until {m.EndDate.Value.ToShortDateString()}"
+                        : "ongoing";
+                    Console.WriteLine($"  {pet.Name} - {m.Name} {m.Dosage} {m.Frequency} ({endDisplay})");
+                    anyMeds = true;
+                }
+            }
+            if (!anyMeds) Console.WriteLine("  No active medications.");
         }
 
         /// <summary>
@@ -664,6 +684,185 @@ namespace PetCareManagementSystem.UI
         }
 
         /// <summary>
+        /// Displays the medications menu and handles all medication and treatment
+        /// management actions including adding, viewing, editing, and deleting records.
+        /// </summary>
+        private void ManageMedications()
+        {
+            Console.WriteLine("\n==== MANAGE MEDICATIONS & TREATMENTS ====");
+            Console.WriteLine("1 Add Medication");
+            Console.WriteLine("2 View All Medications");
+            Console.WriteLine("3 View Active Medications");
+            Console.WriteLine("4 Edit Medication");
+            Console.WriteLine("5 Delete Medication");
+            Console.WriteLine("0 Back");
+
+            var choice = Console.ReadLine();
+
+            if (choice == "1")
+            {
+                var pet = SelectPet();
+                if (pet == null) return;
+
+                var medication = new Medication
+                {
+                    Id        = Guid.NewGuid().ToString(),
+                    PetId     = pet.Id,
+                    StartDate = DateTime.Today
+                };
+
+                Console.Write("Medication / Treatment Name: ");
+                medication.Name = Console.ReadLine();
+
+                Console.Write("Dosage (e.g., 5mg, 1 tablet): ");
+                medication.Dosage = Console.ReadLine();
+
+                Console.Write("Frequency (e.g., Once daily, Every 8 hours): ");
+                medication.Frequency = Console.ReadLine();
+
+                Console.Write("End Date (yyyy-mm-dd) or press Enter if ongoing: ");
+                var endInput = Console.ReadLine();
+                medication.EndDate = string.IsNullOrWhiteSpace(endInput)
+                    ? null
+                    : DateTime.Parse(endInput);
+
+                Console.Write("Notes (e.g., Give with food) or press Enter to skip: ");
+                medication.Notes = Console.ReadLine() ?? string.Empty;
+
+                medicationService.AddMedication(medication);
+                Console.WriteLine($"Medication recorded for {pet.Name}!");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
+            else if (choice == "2")
+            {
+                var pets = petService.GetPetsByUser(currentUser.Id);
+                bool any = false;
+
+                foreach (var pet in pets)
+                {
+                    foreach (var m in medicationService.GetMedications(pet.Id))
+                    {
+                        string endDisplay = m.EndDate.HasValue
+                            ? m.EndDate.Value.ToShortDateString()
+                            : "Ongoing";
+                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency} | Until {endDisplay}");
+                        if (!string.IsNullOrWhiteSpace(m.Notes))
+                            Console.WriteLine($"         Notes: {m.Notes}");
+                        any = true;
+                    }
+                }
+
+                if (!any) Console.WriteLine("No medications recorded.");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
+            else if (choice == "3")
+            {
+                var pets = petService.GetPetsByUser(currentUser.Id);
+                bool any = false;
+
+                foreach (var pet in pets)
+                {
+                    foreach (var m in medicationService.GetActiveMedications(pet.Id))
+                    {
+                        string endDisplay = m.EndDate.HasValue
+                            ? $"until {m.EndDate.Value.ToShortDateString()}"
+                            : "ongoing";
+                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency} ({endDisplay})");
+                        any = true;
+                    }
+                }
+
+                if (!any) Console.WriteLine("No active medications.");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
+            else if (choice == "4")
+            {
+                var medications = GetCurrentUserMedications(out var petLookup);
+
+                if (medications.Count == 0)
+                {
+                    Console.WriteLine("No medications to edit.");
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
+                    return;
+                }
+
+                PrintMedicationList(medications, petLookup);
+
+                Console.Write("Select medication number to edit: ");
+                int idx = int.Parse(Console.ReadLine()) - 1;
+                var med = medications[idx];
+
+                Console.WriteLine("\nPress Enter to keep the current value.");
+
+                Console.Write($"Name [{med.Name}]: ");
+                var input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input)) med.Name = input;
+
+                Console.Write($"Dosage [{med.Dosage}]: ");
+                input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input)) med.Dosage = input;
+
+                Console.Write($"Frequency [{med.Frequency}]: ");
+                input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input)) med.Frequency = input;
+
+                string currentEnd = med.EndDate.HasValue
+                    ? med.EndDate.Value.ToShortDateString()
+                    : "Ongoing";
+                Console.Write($"End Date [{currentEnd}] (yyyy-mm-dd or press Enter to keep, type 'clear' for ongoing): ");
+                input = Console.ReadLine();
+                if (input?.ToLower() == "clear")
+                    med.EndDate = null;
+                else if (!string.IsNullOrWhiteSpace(input))
+                    med.EndDate = DateTime.Parse(input);
+
+                Console.Write($"Notes [{med.Notes}]: ");
+                input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input)) med.Notes = input;
+
+                medicationService.UpdateMedication(med);
+                Console.WriteLine("Medication updated!");
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
+            else if (choice == "5")
+            {
+                var medications = GetCurrentUserMedications(out var petLookup);
+
+                if (medications.Count == 0)
+                {
+                    Console.WriteLine("No medications to delete.");
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
+                    return;
+                }
+
+                PrintMedicationList(medications, petLookup);
+
+                Console.Write("Select medication number to delete: ");
+                int idx = int.Parse(Console.ReadLine()) - 1;
+                var target = medications[idx];
+
+                Console.Write($"Delete {target.Name} for {petLookup[target.PetId].Name}? (y/n): ");
+                if (Console.ReadLine()?.ToLower() == "y")
+                {
+                    medicationService.DeleteMedication(target.Id);
+                    Console.WriteLine("Medication deleted.");
+                }
+                else
+                {
+                    Console.WriteLine("Cancelled.");
+                }
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
+            }
+        }
+
+        /// <summary>
         /// Displays the user menu and handles all user actions
         /// including viewing users, editing user name, and deleting users.
         /// Delegates all data operations to UserService.
@@ -801,6 +1000,19 @@ namespace PetCareManagementSystem.UI
         }
 
         /// <summary>
+        /// Collects all medications belonging to the current user's pets.
+        /// </summary>
+        private List<Medication> GetCurrentUserMedications(out Dictionary<string, Pet> petLookup)
+        {
+            var pets = petService.GetPetsByUser(currentUser.Id);
+            petLookup = pets.ToDictionary(p => p.Id);
+            var all = new List<Medication>();
+            foreach (var pet in pets)
+                all.AddRange(medicationService.GetMedications(pet.Id));
+            return all;
+        }
+
+        /// <summary>
         /// displays a numbered list of appointments to the console
         /// </summary>
         private void PrintAppointmentList(List<Appointment> appointments, Dictionary<string, Pet> petLookup)
@@ -832,6 +1044,22 @@ namespace PetCareManagementSystem.UI
                 var v = vaccinations[i];
                 var petName = petLookup.ContainsKey(v.PetId) ? petLookup[v.PetId].Name : v.PetId;
                 Console.WriteLine($"{i + 1}. {petName} | {v.VaccineName} | Due {v.NextDueDate.ToShortDateString()}");
+            }
+        }
+
+        /// <summary>
+        /// displays a numbered list of medications to the console
+        /// </summary>
+        private void PrintMedicationList(List<Medication> medications, Dictionary<string, Pet> petLookup)
+        {
+            for (int i = 0; i < medications.Count; i++)
+            {
+                var m = medications[i];
+                var petName = petLookup.ContainsKey(m.PetId) ? petLookup[m.PetId].Name : m.PetId;
+                string endDisplay = m.EndDate.HasValue
+                    ? m.EndDate.Value.ToShortDateString()
+                    : "Ongoing";
+                Console.WriteLine($"{i + 1}. {petName} | {m.Name} | {m.Dosage} | {m.Frequency} | Until {endDisplay}");
             }
         }
 

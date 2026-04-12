@@ -9,6 +9,7 @@ namespace PetCareManagementSystem
     {
         static void Main(string[] args)
         {
+            Console.Clear();
             ConsoleMenu menu = new ConsoleMenu();
             menu.Run();
         }

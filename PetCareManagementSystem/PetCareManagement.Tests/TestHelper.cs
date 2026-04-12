@@ -19,6 +19,7 @@ namespace PetCareManagementSystem.Tests
             FilePaths.AppointmentsFile = Path.Combine(dir, "test_appointments.txt");
             FilePaths.SuppliesFile     = Path.Combine(dir, "test_supplies.txt");
             FilePaths.VaccinationsFile = Path.Combine(dir, "test_vaccinations.txt");
+            FilePaths.MedicationsFile  = Path.Combine(dir, "test_medications.txt");
 
             foreach (var file in new[]
             {
@@ -26,7 +27,8 @@ namespace PetCareManagementSystem.Tests
                 FilePaths.PetsFile,
                 FilePaths.AppointmentsFile,
                 FilePaths.SuppliesFile,
-                FilePaths.VaccinationsFile
+                FilePaths.VaccinationsFile,
+                FilePaths.MedicationsFile
             })
             {
                 if (File.Exists(file))

@@ -10,5 +10,6 @@ namespace PetCareManagementSystem.Data
         public static string AppointmentsFile = "appointments.txt";
         public static string SuppliesFile     = "supplies.txt";
         public static string VaccinationsFile = "vaccinations.txt";
+        public static string MedicationsFile  = "medications.txt";
     }
 }
