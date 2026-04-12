@@ -146,7 +146,7 @@ namespace PetCareManagementSystem.UI
             Console.WriteLine("\nLow Supplies:");
             var lowSupplies = supplyService.GetLowSupplies();
             if (lowSupplies.Count == 0)
-                Console.WriteLine("All supplies sufficient.");
+                Console.WriteLine("  All supplies sufficient.");
             else
                 foreach (var s in lowSupplies)
                     Console.WriteLine($"  {s.Name} - {supplyService.GetDaysRemaining(s)} days remaining");
@@ -720,6 +720,13 @@ namespace PetCareManagementSystem.UI
                 Console.Write("Frequency (e.g., Once daily, Every 8 hours): ");
                 medication.Frequency = Console.ReadLine();
 
+                // Prompt for administration time
+                Console.Write("Administration Time (HH:mm, e.g., 08:00) or press Enter to skip: ");
+                var timeInput = Console.ReadLine();
+                medication.AdministrationTime = string.IsNullOrWhiteSpace(timeInput)
+                    ? null
+                    : TimeSpan.Parse(timeInput);
+
                 Console.Write("End Date (yyyy-mm-dd) or press Enter if ongoing: ");
                 var endInput = Console.ReadLine();
                 medication.EndDate = string.IsNullOrWhiteSpace(endInput)
@@ -731,7 +738,6 @@ namespace PetCareManagementSystem.UI
 
                 medicationService.AddMedication(medication);
                 Console.WriteLine($"Medication recorded for {pet.Name}!");
-                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "2")
@@ -746,15 +752,17 @@ namespace PetCareManagementSystem.UI
                         string endDisplay = m.EndDate.HasValue
                             ? m.EndDate.Value.ToShortDateString()
                             : "Ongoing";
-                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency} | Until {endDisplay}");
+                        string timeDisplay = m.AdministrationTime.HasValue
+                            ? m.AdministrationTime.Value.ToString(@"hh\:mm")
+                            : "No specific time";
+                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency} | Time: {timeDisplay} | Until {endDisplay}");
                         if (!string.IsNullOrWhiteSpace(m.Notes))
-                            Console.WriteLine($"         Notes: {m.Notes}");
+                            Console.WriteLine($"  Notes: {m.Notes}");
                         any = true;
                     }
                 }
 
                 if (!any) Console.WriteLine("No medications recorded.");
-                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "3")
@@ -766,16 +774,13 @@ namespace PetCareManagementSystem.UI
                 {
                     foreach (var m in medicationService.GetActiveMedications(pet.Id))
                     {
-                        string endDisplay = m.EndDate.HasValue
-                            ? $"until {m.EndDate.Value.ToShortDateString()}"
-                            : "ongoing";
-                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency} ({endDisplay})");
+                        Console.WriteLine($"{pet.Name} | {m.Name} | {m.Dosage} | {m.Frequency}");
+                        Console.WriteLine($"  Next dose: {m.NextDoseDisplay}");
                         any = true;
                     }
                 }
 
                 if (!any) Console.WriteLine("No active medications.");
-                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "4")
@@ -785,7 +790,6 @@ namespace PetCareManagementSystem.UI
                 if (medications.Count == 0)
                 {
                     Console.WriteLine("No medications to edit.");
-                    Console.WriteLine("Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -810,10 +814,21 @@ namespace PetCareManagementSystem.UI
                 input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input)) med.Frequency = input;
 
+                // Edit administration time
+                string currentTime = med.AdministrationTime.HasValue
+                    ? med.AdministrationTime.Value.ToString(@"hh\:mm")
+                    : "Not set";
+                Console.Write($"Administration Time [{currentTime}] (HH:mm, press Enter to keep, type 'clear' to remove): ");
+                input = Console.ReadLine();
+                if (input?.ToLower() == "clear")
+                    med.AdministrationTime = null;
+                else if (!string.IsNullOrWhiteSpace(input))
+                    med.AdministrationTime = TimeSpan.Parse(input);
+
                 string currentEnd = med.EndDate.HasValue
                     ? med.EndDate.Value.ToShortDateString()
                     : "Ongoing";
-                Console.Write($"End Date [{currentEnd}] (yyyy-mm-dd or press Enter to keep, type 'clear' for ongoing): ");
+                Console.Write($"End Date [{currentEnd}] (yyyy-mm-dd, press Enter to keep, type 'clear' for ongoing): ");
                 input = Console.ReadLine();
                 if (input?.ToLower() == "clear")
                     med.EndDate = null;
@@ -826,7 +841,6 @@ namespace PetCareManagementSystem.UI
 
                 medicationService.UpdateMedication(med);
                 Console.WriteLine("Medication updated!");
-                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
             else if (choice == "5")
@@ -836,7 +850,6 @@ namespace PetCareManagementSystem.UI
                 if (medications.Count == 0)
                 {
                     Console.WriteLine("No medications to delete.");
-                    Console.WriteLine("Press any key to continue.");
                     Console.ReadKey();
                     return;
                 }
@@ -857,7 +870,6 @@ namespace PetCareManagementSystem.UI
                 {
                     Console.WriteLine("Cancelled.");
                 }
-                Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
         }

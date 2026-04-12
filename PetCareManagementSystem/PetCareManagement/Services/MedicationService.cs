@@ -125,6 +125,22 @@ namespace PetCareManagementSystem.Services
         }
 
         /// <summary>
+        /// Converts Medication object to a pipe-delimited string for storage.
+        /// </summary>
+        private string Serialize(Medication medication)
+        {
+            string adminTime = medication.AdministrationTime.HasValue
+                ? medication.AdministrationTime.Value.ToString(@"hh\:mm")
+                : string.Empty;
+
+            string endDate = medication.EndDate.HasValue
+                ? medication.EndDate.Value.ToString()
+                : string.Empty;
+
+            return $"{medication.Id}|{medication.PetId}|{medication.Name}|{medication.Dosage}|{medication.Frequency}|{adminTime}|{medication.StartDate}|{endDate}|{medication.Notes}";
+        }
+
+        /// <summary>
         /// Parses a pipe-delimited string array into a Medication object.
         /// </summary>
         private Medication ParseMedication(string[] parts)
@@ -136,9 +152,10 @@ namespace PetCareManagementSystem.Services
                 Name      = parts[2],
                 Dosage    = parts[3],
                 Frequency = parts[4],
-                StartDate = DateTime.Parse(parts[5]),
-                EndDate   = string.IsNullOrWhiteSpace(parts[6]) ? null : DateTime.Parse(parts[6]),
-                Notes     = parts[7]
+                AdministrationTime = string.IsNullOrWhiteSpace(parts[5]) ? null : TimeSpan.Parse(parts[5]),
+                StartDate = DateTime.Parse(parts[6]),
+                EndDate   = string.IsNullOrWhiteSpace(parts[6]) ? null : DateTime.Parse(parts[7]),
+                Notes     = parts[8]
             };
         }
     }
